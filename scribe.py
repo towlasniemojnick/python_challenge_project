@@ -6,7 +6,7 @@ class Canvas:
     def __init__(self, width, height):
         self._x = width
         self._y = height
-        self._canvas = [['' for y in range(self._y)]for x in range(self._x)]
+        self._canvas = [['' for _y in range(self._y)]for _x in range(self._x)]
 
     def setPos(self, pos, mark):
         self._canvas[pos[0]][pos[1]] = mark
@@ -36,6 +36,6 @@ class TerminalScribe:
 canvas = Canvas(20,20)
 scribe = TerminalScribe(canvas)
 
-for i in range(0,10):
-    for j in range(0,10):
+for i in range(0,20):
+    for j in range(0,20):
         scribe.draw((i,j))
