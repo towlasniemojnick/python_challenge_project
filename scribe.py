@@ -86,16 +86,33 @@ class TerminalScribe:
         for i in range(1,size):
             self.left()
 
+    def drawRectangle(self, size_a, size_b):
+        for i in range(size_a):
+            self.right()
+        for i in range(size_b):
+            self.down()
+        for i in range(size_a):
+            self.left()
+        for i in range(size_b):
+            self.up()
+
+    def drawCircle(self, center_x, center_y, radius):
+        for i in range(360):
+            self.pos = [center_x, center_y]
+            self.setAngle(i)
+            for j in range(radius):
+                self.moveForward()
+
 # # Create a new Canvas instance that is 30 units wide by 30 units tall
 canvas = Canvas(30, 30)
 
 # Create a new scribe and give it the Canvas object
 scribe = TerminalScribe(canvas)
-scribe.setAngle(120)
 
-for i in range(30):
-    scribe.moveForward()
+# scribe.drawRectangle(5,10)
 
 # scribe.drawSquare(10)
+
+scribe.drawCircle(5,5,3)
 
 
