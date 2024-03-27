@@ -1,41 +1,101 @@
-import time
 import os
+import time
+import math
+from termcolor import colored
 
-
+# This is the Canvas class. It defines some height and width, and a
+# matrix of characters to keep track of where the TerminalScribes are moving
 class Canvas:
     def __init__(self, width, height):
         self._x = width
         self._y = height
-        self._canvas = [['' for _y in range(self._y)]for _x in range(self._x)]
+        # This is a grid that contains data about where the
+        # TerminalScribes have visited
+        self._canvas = [[' ' for y in range(self._y)] for x in range(self._x)]
 
+    # Returns True if the given point is outside the boundaries of the Canvas
+    def hitsWall(self, point):
+        return round(point[0]) < 0 or round(point[0]) >= self._x or round(point[1]) < 0 or round(point[1]) >= self._y
+
+    # Set the given position to the provided character on the canvas
     def setPos(self, pos, mark):
-        self._canvas[pos[0]][pos[1]] = mark
+        self._canvas[round(pos[0])][round(pos[1])] = mark
 
+    # Clear the terminal (used to create animation)
     def clear(self):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
 
+    # Clear the terminal and then print each line in the canvas
     def print(self):
         self.clear()
         for y in range(self._y):
-            print([' '.join([col[y] for col in self._canvas])])
+            print(' '.join([col[y] for col in self._canvas]))
 
 class TerminalScribe:
     def __init__(self, canvas):
         self.canvas = canvas
+        self.trail = '.'
+        self.mark = '*'
+        self.framerate = 0.05
         self.pos = [0, 0]
 
-        self.mark = '*'
-        self.trail = '.'
+        self.direction = [0,1]
+    def setAngle(self, angle_deg):
+        angle_rad = (angle_deg/180) * math.pi
+        self.direction = [math.sin(angle_rad),-math.cos(angle_rad)]
+
+    def moveForward(self):
+        pos = [self.pos[0] + self.direction[0], self.pos[1] + self.direction[1]]
+        if not self.canvas.hitsWall(pos):
+            self.draw(pos)
+
+    def up(self):
+        self.direction = [0,-1]
+        self.moveForward()
+
+    def down(self):
+        self.direction = [0,1]
+        self.moveForward()
+    def right(self):
+        self.direction = [1,0]
+        self.moveForward()
+
+    def left(self):
+        self.direction = [-1,0]
+        self.moveForward()
 
     def draw(self, pos):
+        # Set the old position to the "trail" symbol
         self.canvas.setPos(self.pos, self.trail)
+        # Update position
         self.pos = pos
-        self.canvas.setPos(self.pos, self.mark)
+        # Set the new position to the "mark" symbol
+        self.canvas.setPos(self.pos, colored(self.mark, 'red'))
+        # Print everything to the screen
         self.canvas.print()
+        # Sleep for a little bit to create the animation
+        time.sleep(self.framerate)
 
-canvas = Canvas(20,20)
+    def drawSquare(self, size):
+        for i in range(1,size):
+            self.down()
+        for i in range(1,size):
+            self.right()
+        for i in range(1,size):
+            self.up()
+        for i in range(1,size):
+            self.left()
+
+# # Create a new Canvas instance that is 30 units wide by 30 units tall
+canvas = Canvas(30, 30)
+
+# Create a new scribe and give it the Canvas object
 scribe = TerminalScribe(canvas)
+scribe.setAngle(120)
 
-for i in range(0,20):
-    for j in range(0,20):
-        scribe.draw((i,j))
+for i in range(30):
+    scribe.moveForward()
+
+# scribe.drawSquare(10)
+
+
